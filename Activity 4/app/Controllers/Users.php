@@ -24,7 +24,9 @@ class Users extends BaseController
     {
         $rules = [
             'username' => 'required|is_unique[users.username]',
-            'full_name' => 'required'
+            'full_name' => 'required',
+            'password' => 'required|min_length[8]',
+            'confirm_password' => 'required|matches[password]',
         ];
 
         if (!$this->validate($rules)) {
@@ -35,11 +37,19 @@ class Users extends BaseController
 
         $userModel = new UserModel();
 
-        $userModel->insert([
-            'username'   => $this->request->getPost('username'),
-            'full_name'  => $this->request->getPost('full_name'),
+        $hashedPassword = password_hash(
+            $this->request->getPost('password'),
+            PASSWORD_DEFAULT
+        );
+
+        $data = [
+            'username'  => $this->request->getPost('username'),
+            'full_name' => $this->request->getPost('full_name'),
+            'password'  => $hashedPassword,
             'created_at' => date('Y-m-d H:i:s')
-        ]);
+        ];
+
+        $userModel->insert($data);
 
         return redirect()->to('/users');
     }
@@ -97,6 +107,31 @@ class Users extends BaseController
                         'username' => 'The username is already in use.'
                     ]);
             }
+        }
+
+        $newPassword = $this->request->getPost('password');
+        $confirmPassword = $this->request->getPost('confirm_password');
+
+        if ($newPassword !== '') {
+
+            $passwordRules = [
+                'password' => 'required|min_length[8]',
+                'confirm_password' => 'required|matches[password]',
+            ];
+
+            if (!$this->validate($passwordRules)) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('errors', $this->validator->getErrors());
+            }
+
+        } elseif ($confirmPassword !== '') {
+
+            return redirect()->back()
+                ->withInput()
+                ->with('errors', [
+                    'password' => 'Enter a new password before confirming it.'
+                ]);
         }
 
         // Keep existing avatar by default
@@ -185,11 +220,21 @@ class Users extends BaseController
         }
 
         // Update the database
-        $userModel->update($id, [
+        $updateData = [
             'username'  => $newUsername,
             'full_name' => $this->request->getPost('full_name'),
             'avatar'    => $avatarName,
-        ]);
+        ];
+
+        // Update password only if a new one was entered
+        if ($newPassword !== '') {
+            $updateData['password'] = password_hash(
+                $newPassword,
+                PASSWORD_DEFAULT
+            );
+        }
+
+        $userModel->update($id, $updateData);
 
         return redirect()->to('/users');
     }

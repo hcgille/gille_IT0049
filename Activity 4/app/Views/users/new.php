@@ -16,7 +16,9 @@
     </ul>
 <?php endif; ?>
 
-<form action="/users/create" method="post">
+<form action="<?= site_url('users/create') ?>"
+      method="post"
+      enctype="multipart/form-data">
 
     <?= csrf_field() ?>
 
@@ -34,6 +36,30 @@
         type="text"
         name="full_name"
         value="<?= old('full_name') ?>"
+    >
+
+    <br><br>
+
+    <br><br>
+
+    <label>Password</label><br>
+    <input
+        type="password"
+        name="password"
+        required
+        minlength="8"
+        autocomplete="new-password"
+    >
+
+    <br><br>
+
+    <label>Confirm Password</label><br>
+    <input
+        type="password"
+        name="confirm_password"
+        required
+        minlength="8"
+        autocomplete="new-password"
     >
 
     <br><br>

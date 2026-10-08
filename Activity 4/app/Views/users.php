@@ -10,6 +10,12 @@
         <a href="/about">About</a> |
         <a href="/customers">Customer Accounts</a> |
         <a href="/users">User Accounts</a>
+
+        <?php if (session()->get('logged_in')): ?>
+            <a href="/logout">Logout</a>
+        <?php else: ?>
+            <a href="/login">Login</a>
+        <?php endif; ?>
     </nav>
 
     <hr>

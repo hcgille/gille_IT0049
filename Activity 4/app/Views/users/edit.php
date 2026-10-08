@@ -42,6 +42,28 @@
 
     <br><br>
 
+    <label>New Password (Optional)</label><br>
+    <input
+        type="password"
+        name="password"
+        minlength="8"
+        autocomplete="new-password"
+    >
+
+    <br><br>
+
+    <label>Confirm New Password</label><br>
+    <input
+        type="password"
+        name="confirm_password"
+        minlength="8"
+        autocomplete="new-password"
+    >
+
+    <p>Leave both fields blank to keep the current password.</p>
+
+    <br><br>
+
     <label>Profile Picture</label><br>
     <input
         type="file"
